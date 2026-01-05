@@ -8,6 +8,7 @@ from langchain.tools import tool
 from langchain.agents import create_agent
 import json
 from typing import Optional, Dict, Any
+import os
 
 # ============================================
 # STEP 1: DEFINE TOOLS (What agent CAN do)
@@ -170,23 +171,25 @@ def search_flights(
 # STEP 2: CREATE AGENT WITH LOGIC FLOW
 # ============================================
 
-def create_booking_agent():
-    """Create agent that handles the complete workflow"""
+
+# --- lazy singleton ---
+_AGENT = None
+
+def get_agent():
+    global _AGENT
+    if _AGENT is None:
+        llm = ChatAnthropic(
+            model="claude-sonnet-4-20250514",
+            temperature=0,
+            max_tokens=4000,
+            # Enable caching for repeated system prompts & tools
+            default_headers={
+                "anthropic-beta": "prompt-caching-2024-07-31"
+            }
+        )
     
-    llm = ChatAnthropic(
-        model="claude-sonnet-4-20250514",
-        temperature=0,
-        max_tokens=4000
-    )
-    
-    tools = [
-        extract_booking_info,
-        validate_booking_requirements,
-        search_flights
-    ]
-    
-    # THIS IS WHERE THE LOGIC IS DEFINED
-    system_prompt = """You are a travel booking assistant. Follow this EXACT workflow:
+        tools = [extract_booking_info, validate_booking_requirements, search_flights]
+        system_prompt = """You are a travel booking assistant. Follow this EXACT workflow:
 
 WORKFLOW STEPS:
 1️⃣ First, analyze the customer's email to extract booking details
@@ -222,14 +225,9 @@ NEVER:
 - Ask for info that was already provided
 
 Always use the tools to make decisions, don't guess."""
-    
-    agent = create_agent(
-        llm,
-        tools,
-        state_modifier=system_prompt,
-    )
-    
-    return agent
+
+        _AGENT = create_agent(llm, tools=tools, system_prompt=system_prompt)
+    return _AGENT
 
 
 # ============================================
@@ -238,8 +236,8 @@ Always use the tools to make decisions, don't guess."""
 
 def analyze_ticket_with_agent(thread_json: Dict[str, Any]) -> Dict[str, str]:
     """
-    THIS IS WHAT REPLACES YOUR analyze_thread_single_call() from slm.py
-    
+    Analyze a Zoho Desk ticket thread using the LangChain agent.    
+
     LOGIC FLOW:
     1. Agent reads the email thread
     2. Agent validates if info is complete
@@ -265,7 +263,7 @@ def analyze_ticket_with_agent(thread_json: Dict[str, Any]) -> Dict[str, str]:
         }
     """
     try:
-        agent = create_booking_agent()
+        agent = get_agent()
         
         # Format the conversation history
         conversation = "\n\n".join([
@@ -349,25 +347,8 @@ Follow the workflow to either:
         }
 
 
-# ============================================
-# STEP 4: INTEGRATION WITH YOUR zoho_api.py
-# ============================================
 
 """
-In your zoho_api.py file, replace this line:
-
-    # OLD CODE:
-    from slm import analyze_thread_single_call
-    llm_result = analyze_thread_single_call(thread_json)
-    
-    # NEW CODE:
-    from langchain_agent import analyze_ticket_with_agent
-    llm_result = analyze_ticket_with_agent(thread_json)
-
-That's it! Everything else stays the same because the return format is identical.
-"""
-
-
 # ============================================
 # EXAMPLE USAGE & TEST CASES
 # ============================================
@@ -444,3 +425,5 @@ if __name__ == "__main__":
     
     # Expected: type = "present"
     # Expected: msg contains one-way flight options
+
+    """
