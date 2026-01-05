@@ -1,0 +1,27 @@
+"""
+{
+    "access_token": "1000.82c9fe94f367ee4087551cb480cb0eb1.dfed5d14b15924d4c3e7f9c0bf7172d5",
+    "refresh_token": "1000.0c6166f3273c4cf78cbcc5382150cdab.9453cde7b39352a7b0fb79f3f3ccfd1d",
+    "scope": "Desk.tickets.READ",
+    "api_domain": "https://www.zohoapis.com",
+    "token_type": "Bearer",
+    "expires_in": 3600
+}"""
+
+#"access_token": "1000.502ea8b72eb94d5b93f6560929861f58.824321a857a56160ae06280ab896a06d",
+
+#https://desk.zoho.com/agent/cozmotest/cozmo/tickets/list/all-cases
+#https://accounts.zoho.com/oauth/v2/auth?client_id=1000.UKQZC2TGQF2ELEF0MR075KKSMB41ZB&response_type=code&redirect_uri=https://www.zoho.com&scope=Desk.tickets.READ&access_type=offline
+
+
+#https://accounts.zoho.com/oauth/v2/token?code=1000.00b8240fddee356c731df45345ba839d.83e6d3adaffd28d7325c31523ac6ac75&grant_type=authorization_code&client_id=1000.UKQZC2TGQF2ELEF0MR075KKSMB41ZB&client_secret=41b8976547619fac17b1bd1a2d00c809877c618b50&redirect_uri=https://www.zoho.com&scope=Desk.tickets.READ
+
+
+
+
+| Model                              | Removes                               | Size    | Runs offline |
+| ---------------------------------- | ------------------------------------- | ------- | ------------ |
+| **pii-bert (microsoft)**           | names, cards, passports, phone, email | ~420 MB | ✔            |
+| **distilpii (Palo-Alto-Networks)** | 30+ PII types                         | ~260 MB | ✔            |
+| **RoBERTA-PII**                    | high accuracy                         | ~450 MB | ✔            |
+| **dynabench/pii**                  | lightweight                           | ~180 MB | ✔            |
