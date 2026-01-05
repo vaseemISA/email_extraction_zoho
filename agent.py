@@ -5,8 +5,7 @@ COMPLETE LOGIC FLOW EXPLAINED
 
 from langchain_anthropic import ChatAnthropic
 from langchain.tools import tool
-from langgraph.prebuilt import create_react_agent
-from langgraph.checkpoint.memory import MemorySaver
+from langchain.agents import create_agent
 import json
 from typing import Optional, Dict, Any
 
@@ -224,7 +223,7 @@ NEVER:
 
 Always use the tools to make decisions, don't guess."""
     
-    agent = create_react_agent(
+    agent = create_agent(
         llm,
         tools,
         state_modifier=system_prompt,
