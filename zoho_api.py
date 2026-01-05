@@ -10,7 +10,7 @@ import re
 from bs4 import BeautifulSoup
 import html
 from slm import analyze_thread_single_call
-from agent_cached import analyze_ticket_with_caching
+from agent import analyze_ticket_with_caching
 
 load_dotenv()
 
